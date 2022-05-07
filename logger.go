@@ -1,9 +1,12 @@
 package logger
 
 import (
+	"fmt"
 	"os"
+	"runtime"
+	"strings"
 
-	runtime "github.com/banzaicloud/logrus-runtime-formatter"
+	runtimeLogger "github.com/banzaicloud/logrus-runtime-formatter"
 	"github.com/sirupsen/logrus"
 )
 
@@ -17,7 +20,8 @@ type (
 	}
 
 	customLogger struct {
-		log *logrus.Entry
+		log   *logrus.Entry
+		level int
 	}
 
 	PrefixLoggerName struct {
@@ -26,8 +30,8 @@ type (
 	}
 )
 
-func NewLogger(setupName []PrefixLoggerName) CustomLogger {
-	formatter := &runtime.Formatter{ChildFormatter: &logrus.TextFormatter{
+func NewLogger(setupName []PrefixLoggerName, level int) CustomLogger {
+	formatter := &runtimeLogger.Formatter{ChildFormatter: &logrus.TextFormatter{
 		ForceColors:   true,
 		FullTimestamp: true,
 	}}
@@ -44,8 +48,8 @@ func NewLogger(setupName []PrefixLoggerName) CustomLogger {
 	}
 
 	return &customLogger{
-		log: logrus.WithField(setupName[0].Title, setupName[0].Description),
-	}
+		log:   logrus.WithField(setupName[0].Title, setupName[0].Description),
+		level: level}
 }
 
 func (c *customLogger) Info(format string, args ...interface{}) {
@@ -57,6 +61,8 @@ func (c *customLogger) Info(format string, args ...interface{}) {
 }
 
 func (c *customLogger) Warning(format string, args ...interface{}) {
+	c.log.Info(fileInfo)
+
 	if format != "" {
 		c.log.Warningf(format, args)
 	} else {
@@ -65,6 +71,8 @@ func (c *customLogger) Warning(format string, args ...interface{}) {
 }
 
 func (c *customLogger) Error(format string, args ...interface{}) {
+	c.log.Info(fileInfo)
+
 	if format != "" {
 		c.log.Errorf(format, args)
 	} else {
@@ -73,6 +81,8 @@ func (c *customLogger) Error(format string, args ...interface{}) {
 }
 
 func (c *customLogger) Debug(format string, args ...interface{}) {
+	c.log.Info(fileInfo)
+
 	if format != "" {
 		c.log.Debugf(format, args)
 	} else {
@@ -81,9 +91,25 @@ func (c *customLogger) Debug(format string, args ...interface{}) {
 }
 
 func (c *customLogger) Trace(format string, args ...interface{}) {
+	c.log.Info(fileInfo)
+
 	if format != "" {
 		c.log.Tracef(format, args)
 	} else {
 		c.log.Trace(args)
 	}
+}
+
+func fileInfo(skip int) string {
+	_, file, line, ok := runtime.Caller(skip)
+	if !ok {
+		file = "<???>"
+		line = 1
+	} else {
+		slash := strings.LastIndex(file, "/")
+		if slash >= 0 {
+			file = file[slash+1:]
+		}
+	}
+	return fmt.Sprintf("%s:%d", file, line)
 }
