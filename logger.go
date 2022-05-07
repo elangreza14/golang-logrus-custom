@@ -34,7 +34,7 @@ func NewLogger(setupName []PrefixLoggerName) CustomLogger {
 	formatter.Line = true
 	logrus.SetFormatter(formatter)
 	logrus.SetOutput(os.Stdout)
-	logrus.SetLevel(logrus.InfoLevel)
+	// logrus.SetLevel(logrus.InfoLevel)
 	logrus.SetReportCaller(true)
 
 	if len(setupName) > 1 {
