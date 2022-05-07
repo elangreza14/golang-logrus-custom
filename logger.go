@@ -53,6 +53,8 @@ func NewLogger(setupName []PrefixLoggerName, level int) CustomLogger {
 }
 
 func (c *customLogger) Info(format string, args ...interface{}) {
+	c.log.Info(fileInfo(c.level))
+
 	if format != "" {
 		c.log.Infof(format, args)
 	} else {
@@ -61,7 +63,7 @@ func (c *customLogger) Info(format string, args ...interface{}) {
 }
 
 func (c *customLogger) Warning(format string, args ...interface{}) {
-	c.log.Info(fileInfo)
+	c.log.Info(fileInfo(c.level))
 
 	if format != "" {
 		c.log.Warningf(format, args)
@@ -71,7 +73,7 @@ func (c *customLogger) Warning(format string, args ...interface{}) {
 }
 
 func (c *customLogger) Error(format string, args ...interface{}) {
-	c.log.Info(fileInfo)
+	c.log.Info(fileInfo(c.level))
 
 	if format != "" {
 		c.log.Errorf(format, args)
@@ -81,7 +83,7 @@ func (c *customLogger) Error(format string, args ...interface{}) {
 }
 
 func (c *customLogger) Debug(format string, args ...interface{}) {
-	c.log.Info(fileInfo)
+	c.log.Info(fileInfo(c.level))
 
 	if format != "" {
 		c.log.Debugf(format, args)
@@ -91,7 +93,7 @@ func (c *customLogger) Debug(format string, args ...interface{}) {
 }
 
 func (c *customLogger) Trace(format string, args ...interface{}) {
-	c.log.Info(fileInfo)
+	c.log.Info(fileInfo(c.level))
 
 	if format != "" {
 		c.log.Tracef(format, args)
